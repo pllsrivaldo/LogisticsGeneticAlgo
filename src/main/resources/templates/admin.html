@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>AI Command Center</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050b14; color: #cbd5e1; font-family: 'Roboto', sans-serif; overflow-x: hidden; }
+        :root { --neon-blue: #0ea5e9; --neon-green: #10b981; --neon-red: #ef4444; --dark-bg: #0f172a; }
+        .navbar { background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid #1e293b; backdrop-filter: blur(10px); }
+        .brand-font { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; color: var(--neon-blue); text-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
+        .card-cyber { background: #0f172a; border: 1px solid #334155; border-radius: 4px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); margin-bottom: 20px; position: relative; overflow: hidden; }
+        .card-cyber::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-blue), transparent); }
+        .card-header-cyber { background: rgba(30, 41, 59, 0.5); border-bottom: 1px solid #334155; padding: 15px; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: white; }
+        .form-control-cyber, .form-select-cyber { background: #020617; border: 1px solid #475569; color: var(--neon-blue); font-family: 'Courier New', monospace; font-size: 0.85rem; }
+        .form-control-cyber:focus { background: #020617; border-color: var(--neon-blue); color: white; box-shadow: 0 0 10px rgba(14, 165, 233, 0.2); }
+        .cyber-label { font-size: 0.75rem; color: #e2e8f0; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+        .cyber-help { font-size: 0.7rem; color: #94a3b8; font-style: italic; margin-top: 2px; display: block; }
+        .btn-cyber-primary { background: rgba(14, 165, 233, 0.1); border: 1px solid var(--neon-blue); color: var(--neon-blue); font-family: 'Orbitron', sans-serif; letter-spacing: 1px; transition: all 0.3s; }
+        .btn-cyber-primary:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 20px var(--neon-blue); }
+        .btn-cyber-success { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--neon-green); color: var(--neon-green); font-family: 'Orbitron', sans-serif; letter-spacing: 1px; transition: all 0.3s; }
+        .btn-cyber-success:hover { background: var(--neon-green); color: black; box-shadow: 0 0 20px var(--neon-green); }
+        .btn-cyber-danger { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--neon-red); color: var(--neon-red); font-family: 'Orbitron', sans-serif; letter-spacing: 1px; }
+        .btn-cyber-danger:hover { background: var(--neon-red); color: white; box-shadow: 0 0 20px var(--neon-red); }
+        .ship-deck { display: flex; justify-content: space-around; padding: 20px; background: #020617; border: 1px dashed #334155; overflow-x: auto; }
+        .stack-column { display: flex; flex-direction: column; width: 100px; border-bottom: 3px solid #64748b; padding-bottom: 5px; margin: 0 5px; }
+        .container-box { height: 50px; margin-bottom: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; color: white; position: relative; border: 1px solid rgba(255,255,255,0.3); text-shadow: 1px 1px 2px black; }
+        .container-empty { height: 50px; border: 1px dashed #334155; margin-bottom: 3px; opacity: 0.2; }
+        .dest-Surabaya { background: #16a34a; } .dest-Jakarta { background: #dc2626; } .dest-Makassar { background: #2563eb; } .dest-Balikpapan { background: #d97706; } .dest-Batam { background: #9333ea; } .dest-Belawan { background: #0891b2; }
+        .table-cyber { color: #cbd5e1; font-size: 0.8rem; } .table-cyber thead { border-bottom: 1px solid #475569; } .table-cyber th { color: var(--neon-blue); font-family: 'Orbitron', sans-serif; } .table-cyber td { border-bottom: 1px solid #1e293b; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar mb-4 px-4">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-microchip fa-2x text-info me-3"></i>
+        <div><div class="brand-font fs-4">STOWAGE.AI</div><small class="text-muted" style="letter-spacing: 3px;">COMMAND CENTER SYSTEM</small></div>
+    </div>
+    <a href="/" class="btn btn-sm btn-outline-secondary rounded-0 px-4">DISCONNECT</a>
+</nav>
+
+<div class="container-fluid px-4">
+    <div class="row g-4">
+        
+        <div class="col-md-3">
+            <div class="card-cyber">
+                <div class="card-header-cyber"><i class="fas fa-sliders-h me-2"></i> SHIP PARAMETERS</div>
+                <div class="card-body">
+                    <form action="/admin/config/save" method="post">
+                        <div class="mb-3">
+                            <span class="cyber-label">VESSEL IDENTITY</span>
+                            <div class="input-group input-group-sm">
+                                <input name="shipId" type="text" class="form-control form-control-cyber" th:value="${currentShip.id}" required>
+                                <input name="shipName" type="text" class="form-control form-control-cyber" th:value="${currentShip.name}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="cyber-label">MAX CAPACITY</span>
+                            <input name="maxTonnage" type="number" class="form-control form-control-cyber" th:value="${currentShip.maxTonnage}" required>
+                            <span class="cyber-help">Total weight limit in tons.</span>
+                        </div>
+                        <div class="mb-3">
+                            <span class="cyber-label">ORIGIN PORT</span>
+                            <select name="originIdx" class="form-select form-select-cyber">
+                                <option value="0" th:selected="${currentOrigin == 0}">Jakarta</option>
+                                <option value="1" th:selected="${currentOrigin == 1}">Surabaya</option>
+                                <option value="2" th:selected="${currentOrigin == 2}">Batam</option>
+                                <option value="3" th:selected="${currentOrigin == 3}">Semarang</option>
+                                <option value="4" th:selected="${currentOrigin == 4}">Belawan</option>
+                                <option value="5" th:selected="${currentOrigin == 5}">Makassar</option>
+                                <option value="6" th:selected="${currentOrigin == 6}">Balikpapan</option>
+                            </select>
+                            <span class="cyber-help text-warning">Changing this updates customer dropdowns.</span>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <span class="cyber-label">STACKS</span>
+                                <input name="stacks" type="number" class="form-control form-control-cyber" th:value="${currentShip.stacks}" required>
+                            </div>
+                            <div class="col-6">
+                                <span class="cyber-label">HEIGHT</span>
+                                <input name="stackHeight" type="number" class="form-control form-control-cyber" th:value="${currentShip.stackHeight}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="cyber-label">SECURE STACKS (IDX)</span>
+                            <input name="secureStacks" type="text" class="form-control form-control-cyber" th:value="${#strings.listJoin(currentShip.secureStacks, ',')}">
+                            <span class="cyber-help">Example: 0,2 (First & Third stack).</span>
+                        </div>
+                        <div class="mb-4">
+                            <span class="cyber-label">STACK LIMITS (TON)</span>
+                            <input name="stackCapacities" type="text" class="form-control form-control-cyber" th:value="${currentShip.capString}">
+                            <span class="cyber-help">Split by semicolon (e.g. 50;50;50).</span>
+                        </div>
+                        <button type="submit" class="btn btn-cyber-primary w-100 py-2">
+                            <i class="fas fa-save me-2"></i> SAVE CONFIGURATION
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card-cyber">
+                <div class="card-header-cyber text-success border-success"><i class="fas fa-brain me-2"></i> AI CONTROL</div>
+                <div class="card-body text-center">
+                    <h5 class="text-white mb-1"><span th:text="${manifest != null ? manifest.size() : 0}">0</span> ITEMS</h5>
+                    <p class="small text-muted mb-3">READY FOR PROCESSING</p>
+                    <form action="/admin/optimize" method="post">
+                        <button class="btn btn-cyber-success w-100 fw-bold py-3"><i class="fas fa-play-circle me-2"></i> RUN OPTIMIZATION</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card-cyber">
+                <div class="card-header-cyber d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-list me-2"></i> GLOBAL MANIFEST</span>
+                    <form action="/admin/reset" method="post">
+                        <button class="btn btn-outline-danger btn-sm" style="font-size: 0.7rem;">RESET DATA</button>
+                    </form>
+                </div>
+                <div class="card-body p-0">
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        <table class="table table-cyber table-sm m-0">
+                            <thead><tr><th>ID</th><th>WEIGHT</th><th>DESTINATION</th><th>SOURCE</th></tr></thead>
+                            <tbody>
+                                <tr th:each="c : ${manifest}">
+                                    <td class="text-white" th:text="${c.id}"></td>
+                                    <td th:text="${c.weightTon}"></td>
+                                    <td th:text="${c.destName}"></td>
+                                    <td class="text-info" th:text="${c.addedBy}"></td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(manifest)}"><td colspan="4" class="text-center py-3 text-muted">NO DATA UPLOADED</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-cyber" th:if="${result}">
+                <div class="card-header-cyber d-flex justify-content-between">
+                    <span><i class="fas fa-layer-group me-2"></i> STOWAGE PLAN</span>
+                    <span class="text-info" th:text="'FITNESS: ' + ${#numbers.formatDecimal(result.fitness, 1, 2)}"></span>
+                </div>
+                <div class="card-body">
+                    <div class="ship-deck">
+                        <div th:each="stack, stat : ${result.visualStacks}" class="stack-column">
+                            <div th:each="cont : ${stack}">
+                                <div th:if="${cont != null}" th:class="'container-box dest-' + ${cont.destName}" th:title="${cont.weightTon} + ' Ton'">
+                                    <i th:if="${cont.isSpecial}" class="fas fa-bolt text-warning position-absolute top-0 end-0 p-1" style="font-size:8px;"></i>
+                                    <div class="text-center lh-1">
+                                        <span class="d-block" style="font-size: 9px;" th:text="${cont.destName}"></span>
+                                        <span class="d-block text-white-50" style="font-size: 8px;" th:text="'#' + ${cont.id}"></span>
+                                    </div>
+                                </div>
+                                <div th:if="${cont == null}" class="container-empty"></div>
+                            </div>
+                            <div class="text-center text-muted mt-2" style="font-size: 10px;" th:text="'BAY ' + ${stat.index}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3 text-center g-2">
+                        <div class="col-3"><div class="border border-secondary p-2 rounded"><small class="d-block text-muted" style="font-size: 10px;">REVENUE</small><span class="text-success fw-bold" th:text="${#numbers.formatCurrency(result.revenue)}"></span></div></div>
+                        <div class="col-3"><div class="border border-secondary p-2 rounded"><small class="d-block text-muted" style="font-size: 10px;">COST</small><span class="text-warning fw-bold" th:text="${#numbers.formatCurrency(result.cost)}"></span></div></div>
+                        <div class="col-3"><div class="border border-secondary p-2 rounded"><small class="d-block text-muted" style="font-size: 10px;">PENALTY</small><span class="text-danger fw-bold" th:text="${#numbers.formatCurrency(result.penalty)}"></span></div></div>
+                        <div class="col-3"><div class="border border-secondary p-2 rounded"><small class="d-block text-muted" style="font-size: 10px;">LOADED</small><span class="text-info fw-bold"><span th:text="${result.loadedContainers}"></span> Items</span></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card-cyber">
+                        <div class="card-header-cyber"><i class="fas fa-satellite me-2"></i> LIVE GEO-TRACKING</div>
+                        <div class="card-body p-0">
+                            <div style="height: 300px; background: #000;">
+                                <iframe th:if="${mapUrl}" th:src="${mapUrl}" width="100%" height="100%" frameborder="0" style="opacity: 0.8;"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-cyber h-100">
+                        <div class="card-header-cyber text-danger border-danger"><i class="fas fa-exclamation-triangle me-2"></i> OVERLOAD</div>
+                        <div class="card-body p-2" th:if="${result}">
+                            <ul class="list-group list-group-flush bg-transparent">
+                                <li th:each="item : ${result.overloadList}" class="list-group-item bg-transparent text-danger border-secondary py-1" th:text="${item}"></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

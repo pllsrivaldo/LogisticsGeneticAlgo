@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Customer Booking Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f0f4f8; font-family: 'Inter', sans-serif; color: #1e293b; }
+        
+        /* Navbar Premium */
+        .navbar { background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 1rem 0; }
+        .brand-icon { background: linear-gradient(135deg, #2563eb, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Card Styles */
+        .card-premium {
+            background: white; border: none; border-radius: 16px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            padding: 25px; color: white;
+        }
+        
+        /* Input Styles */
+        .form-control, .form-select {
+            border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px;
+            font-weight: 500; transition: all 0.3s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Radio Button Cards */
+        .btn-check:checked + .btn-outline-custom {
+            background-color: #eff6ff; border-color: #3b82f6; color: #1e40af;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); transform: translateY(-2px);
+        }
+        .btn-outline-custom {
+            border: 2px solid #e2e8f0; border-radius: 10px; padding: 15px;
+            text-align: left; transition: all 0.2s; color: #64748b; font-weight: 600;
+        }
+        .btn-outline-custom:hover { background-color: #f8fafc; }
+
+        /* Button Action */
+        .btn-action {
+            background: linear-gradient(135deg, #2563eb, #4f46e5); border: none;
+            padding: 15px; border-radius: 12px; font-weight: 800; letter-spacing: 1px;
+            color: white; box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s;
+        }
+        .btn-action:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.5); color: white; }
+
+        /* Map Container */
+        .map-wrapper {
+            height: 380px; width: 100%; border-radius: 16px; overflow: hidden;
+            border: 4px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Badge Status */
+        .status-pill { background: #dcfce7; color: #166534; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4" href="/">
+                <i class="fas fa-cubes brand-icon me-2"></i> 
+                <span style="color: #0f172a;">LOGISTICS</span><span class="text-primary">PRO</span>
+            </a>
+            <a href="/" class="btn btn-light rounded-pill px-4 fw-bold text-muted"><i class="fas fa-sign-out-alt me-2"></i>Exit</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5 mb-5">
+        <div class="row g-5">
+            
+            <div class="col-lg-5">
+                <div class="card-premium h-100">
+                    <div class="form-header">
+                        <h4 class="m-0 fw-bold"><i class="fas fa-box-open me-2"></i> Register Cargo</h4>
+                        <p class="m-0 opacity-75 small">Fill in the details to generate manifest.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        
+                        <div th:if="${successMessage}" class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4" role="alert" style="background: #ecfdf5; color: #065f46;">
+                            <i class="fas fa-check-circle fs-4 me-3"></i>
+                            <div><strong>Success!</strong><br><span th:text="${successMessage}"></span></div>
+                        </div>
+
+                        <form action="/customer/submit" method="post">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-secondary text-uppercase small">Weight (Tons)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-weight-hanging text-primary"></i></span>
+                                    <input name="weight" type="number" step="0.1" class="form-control border-start-0 ps-0" placeholder="0.0" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-secondary text-uppercase small">Destination</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-map-marker-alt text-danger"></i></span>
+                                    <select name="destination" class="form-select border-start-0 ps-0">
+                                        <option th:each="port : ${destinations}" 
+                                            th:value="${port}" 
+                                            th:text="${port}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-secondary text-uppercase small">Cargo Type</label>
+                                <div class="d-grid gap-2">
+                                    <input type="radio" class="btn-check" name="type" value="Standard" id="t1" checked>
+                                    <label class="btn btn-outline-custom" for="t1">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 me-3"><i class="fas fa-cube text-dark"></i></div>
+                                            <div>Standard<div class="small fw-normal text-muted">General Cargo</div></div>
+                                        </div>
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="type" value="Special Reefer" id="t2">
+                                    <label class="btn btn-outline-custom" for="t2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 me-3"><i class="fas fa-snowflake text-info"></i></div>
+                                            <div>Reefer<div class="small fw-normal text-muted">Temperature Controlled</div></div>
+                                        </div>
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="type" value="Special Hazardous" id="t3">
+                                    <label class="btn btn-outline-custom" for="t3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 me-3"><i class="fas fa-radiation text-danger"></i></div>
+                                            <div>Hazardous<div class="small fw-normal text-muted">Dangerous Goods</div></div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-action w-100">
+                                ADD TO MANIFEST <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="map-wrapper mb-4">
+                    <iframe th:if="${mapUrl}" th:src="${mapUrl}" width="100%" height="100%" frameborder="0"></iframe>
+                    <div th:unless="${mapUrl}" class="d-flex justify-content-center align-items-center h-100 text-muted bg-white">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <p>Loading Route Map...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-premium">
+                    <div class="card-header bg-white border-bottom p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="m-0 fw-bold text-dark"><i class="fas fa-list-ul text-primary me-2"></i> Your Manifest</h5>
+                            <span class="badge bg-light text-dark border">Read Only</span>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4 text-secondary text-uppercase small">ID</th>
+                                    <th class="text-secondary text-uppercase small">Weight</th>
+                                    <th class="text-secondary text-uppercase small">Dest</th>
+                                    <th class="text-secondary text-uppercase small">Type</th>
+                                    <th class="text-secondary text-uppercase small">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c : ${myContainers}">
+                                    <td class="ps-4 fw-bold text-dark" th:text="'#' + ${c.id}"></td>
+                                    <td th:text="${c.weightTon} + ' t'"></td>
+                                    <td><i class="fas fa-map-pin text-danger me-1"></i> <span th:text="${c.destName}"></span></td>
+                                    <td>
+                                        <span th:if="${c.isSpecial}" class="badge bg-warning text-dark"><i class="fas fa-bolt"></i> Special</span>
+                                        <span th:unless="${c.isSpecial}" class="badge bg-secondary">Standard</span>
+                                    </td>
+                                    <td><span class="status-pill">Pending</span></td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(myContainers)}">
+                                    <td colspan="5" class="text-center py-5">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/4076/4076432.png" width="60" class="mb-3 opacity-50">
+                                        <p class="text-muted fw-bold">No cargo items added yet.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_a29a32488d9367ab369be8f99614769b {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_a29a32488d9367ab369be8f99614769b" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_a29a32488d9367ab369be8f99614769b = L.map(
+                "map_a29a32488d9367ab369be8f99614769b",
+                {
+                    center: [-2.5, 118.0],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 5,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_e6125d08d6f8495098c830058a444446 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_e6125d08d6f8495098c830058a444446.addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var circle_marker_411b5ca675cdd33404eb61b30ed8a76c = L.circleMarker(
+                [-6.1751, 106.8272],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "cyan", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+        var popup_4a7dd9731b39aee7178790113c311438 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3f7677dbd295d936248cc509eae285c5 = $(`<div id="html_3f7677dbd295d936248cc509eae285c5" style="width: 100.0%; height: 100.0%;"><b>Jakarta</b></div>`)[0];
+                popup_4a7dd9731b39aee7178790113c311438.setContent(html_3f7677dbd295d936248cc509eae285c5);
+            
+        
+
+        circle_marker_411b5ca675cdd33404eb61b30ed8a76c.bindPopup(popup_4a7dd9731b39aee7178790113c311438)
+        ;
+
+        
+    
+    
+            var circle_marker_8069fa9e0a11c7bf608f609476a057d9 = L.circleMarker(
+                [-7.2575, 112.7521],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "cyan", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+        var popup_255371b5867de2c866259373cd20f720 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b5a635aed45eed3aa1124b4f549972c6 = $(`<div id="html_b5a635aed45eed3aa1124b4f549972c6" style="width: 100.0%; height: 100.0%;"><b>Surabaya</b></div>`)[0];
+                popup_255371b5867de2c866259373cd20f720.setContent(html_b5a635aed45eed3aa1124b4f549972c6);
+            
+        
+
+        circle_marker_8069fa9e0a11c7bf608f609476a057d9.bindPopup(popup_255371b5867de2c866259373cd20f720)
+        ;
+
+        
+    
+    
+            var circle_marker_736548878a2f78610e4d4c8de1c298b9 = L.circleMarker(
+                [-6.9667, 110.4381],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "cyan", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+        var popup_d5c761c7a09b3e42a5b32f386c984306 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_09d1af0052a52705cd1ae0fc0da7ffdf = $(`<div id="html_09d1af0052a52705cd1ae0fc0da7ffdf" style="width: 100.0%; height: 100.0%;"><b>Semarang</b></div>`)[0];
+                popup_d5c761c7a09b3e42a5b32f386c984306.setContent(html_09d1af0052a52705cd1ae0fc0da7ffdf);
+            
+        
+
+        circle_marker_736548878a2f78610e4d4c8de1c298b9.bindPopup(popup_d5c761c7a09b3e42a5b32f386c984306)
+        ;
+
+        
+    
+    
+            var circle_marker_e0ec87fd62e2d9e021ae3ab4c8dfa374 = L.circleMarker(
+                [-1.2558, 116.8253],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "cyan", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+        var popup_b4bfbd4fd4cb5461dd1e88d4373cb363 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_79de26129d4306a4d390568541d56447 = $(`<div id="html_79de26129d4306a4d390568541d56447" style="width: 100.0%; height: 100.0%;"><b>Balikpapan</b></div>`)[0];
+                popup_b4bfbd4fd4cb5461dd1e88d4373cb363.setContent(html_79de26129d4306a4d390568541d56447);
+            
+        
+
+        circle_marker_e0ec87fd62e2d9e021ae3ab4c8dfa374.bindPopup(popup_b4bfbd4fd4cb5461dd1e88d4373cb363)
+        ;
+
+        
+    
+    
+            var circle_marker_ff7f9ddfe2dfa39c6b350faa86f99985 = L.circleMarker(
+                [-5.1477, 119.4327],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "cyan", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+        var popup_e2b49434d8610e49cfce9aff9ecfdf16 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_56d31c2ad01da7d33be2300c668088e2 = $(`<div id="html_56d31c2ad01da7d33be2300c668088e2" style="width: 100.0%; height: 100.0%;"><b>Makassar</b></div>`)[0];
+                popup_e2b49434d8610e49cfce9aff9ecfdf16.setContent(html_56d31c2ad01da7d33be2300c668088e2);
+            
+        
+
+        circle_marker_ff7f9ddfe2dfa39c6b350faa86f99985.bindPopup(popup_e2b49434d8610e49cfce9aff9ecfdf16)
+        ;
+
+        
+    
+    
+            var circle_marker_b15752b31aa74d0d86e2e44dfc797f45 = L.circleMarker(
+                [1.1445, 104.0305],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "cyan", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+        var popup_c79ecfae1c3f0c775a7ab51396053035 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_93ae979a5ff603c146e443f7db2637fd = $(`<div id="html_93ae979a5ff603c146e443f7db2637fd" style="width: 100.0%; height: 100.0%;"><b>Batam</b></div>`)[0];
+                popup_c79ecfae1c3f0c775a7ab51396053035.setContent(html_93ae979a5ff603c146e443f7db2637fd);
+            
+        
+
+        circle_marker_b15752b31aa74d0d86e2e44dfc797f45.bindPopup(popup_c79ecfae1c3f0c775a7ab51396053035)
+        ;
+
+        
+    
+    
+            var circle_marker_10eecd1341c80eaa08c1cc4262f30c9f = L.circleMarker(
+                [3.7844, 98.6804],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "cyan", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+        var popup_c6bfd5c06f6048a6ee7768a4c49e69d6 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1cde8f9ec70eabecabb6b7abdef2a193 = $(`<div id="html_1cde8f9ec70eabecabb6b7abdef2a193" style="width: 100.0%; height: 100.0%;"><b>Belawan</b></div>`)[0];
+                popup_c6bfd5c06f6048a6ee7768a4c49e69d6.setContent(html_1cde8f9ec70eabecabb6b7abdef2a193);
+            
+        
+
+        circle_marker_10eecd1341c80eaa08c1cc4262f30c9f.bindPopup(popup_c6bfd5c06f6048a6ee7768a4c49e69d6)
+        ;
+
+        
+    
+    
+            var poly_line_f937603d46c502f3e8131332bc777870 = L.polyline(
+                [[1.1445, 104.0305], [-6.1751, 106.8272]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var poly_line_052d007cfc2caba157489d92703629a5 = L.polyline(
+                [[1.1445, 104.0305], [-6.1751, 106.8272]],
+                {"bubblingMouseEvents": true, "color": "transparent", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "transparent", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 15}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            poly_line_052d007cfc2caba157489d92703629a5.bindTooltip(
+                `<div>
+                     Batam-Jakarta: 867 KM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_10beff6f259c16d4370872ac308a594e = L.polyline(
+                [[1.1445, 104.0305], [3.7844, 98.6804]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var poly_line_6dea54dadc9af9d9902c65e1c3bc81d4 = L.polyline(
+                [[1.1445, 104.0305], [3.7844, 98.6804]],
+                {"bubblingMouseEvents": true, "color": "transparent", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "transparent", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 15}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            poly_line_6dea54dadc9af9d9902c65e1c3bc81d4.bindTooltip(
+                `<div>
+                     Batam-Belawan: 663 KM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_bcee49c605d588f21b19d86bffa4e5a1 = L.polyline(
+                [[1.1445, 104.0305], [-1.2558, 116.8253]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var poly_line_6cf79dac9873b6835ba4e46e4eaf6fde = L.polyline(
+                [[1.1445, 104.0305], [-1.2558, 116.8253]],
+                {"bubblingMouseEvents": true, "color": "transparent", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "transparent", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 15}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            poly_line_6cf79dac9873b6835ba4e46e4eaf6fde.bindTooltip(
+                `<div>
+                     Batam-Balikpapan: 1449 KM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b8c70edc05024418e36c32108969487b = L.polyline(
+                [[-1.2558, 116.8253], [-5.1477, 119.4327]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var poly_line_6e92117f7f8d7455c0a4dfb60839ba9b = L.polyline(
+                [[-1.2558, 116.8253], [-5.1477, 119.4327]],
+                {"bubblingMouseEvents": true, "color": "transparent", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "transparent", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 15}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            poly_line_6e92117f7f8d7455c0a4dfb60839ba9b.bindTooltip(
+                `<div>
+                     Balikpapan-Makassar: 519 KM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_536a90b52568f69cbe89f0c98ec20e39 = L.polyline(
+                [[-5.1477, 119.4327], [-7.2575, 112.7521]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var poly_line_a490a842e883bdb84577fb78f7fb458d = L.polyline(
+                [[-5.1477, 119.4327], [-7.2575, 112.7521]],
+                {"bubblingMouseEvents": true, "color": "transparent", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "transparent", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 15}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            poly_line_a490a842e883bdb84577fb78f7fb458d.bindTooltip(
+                `<div>
+                     Makassar-Surabaya: 775 KM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_48175a7cb6b274b7e5a14ca464c9e1c8 = L.polyline(
+                [[-7.2575, 112.7521], [-6.9667, 110.4381]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var poly_line_f6aa65560e9a82c7433d036dee8f25e2 = L.polyline(
+                [[-7.2575, 112.7521], [-6.9667, 110.4381]],
+                {"bubblingMouseEvents": true, "color": "transparent", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "transparent", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 15}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            poly_line_f6aa65560e9a82c7433d036dee8f25e2.bindTooltip(
+                `<div>
+                     Surabaya-Semarang: 258 KM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e20c516bddde2b255ea1ea29fb8e50d6 = L.polyline(
+                [[-6.1751, 106.8272], [-6.9667, 110.4381]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var poly_line_573125613061ffcf1986716720dcbf77 = L.polyline(
+                [[-6.1751, 106.8272], [-6.9667, 110.4381]],
+                {"bubblingMouseEvents": true, "color": "transparent", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "transparent", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 15}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            poly_line_573125613061ffcf1986716720dcbf77.bindTooltip(
+                `<div>
+                     Jakarta-Semarang: 409 KM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_7e77f140f31df11a84801a6870058b9e = L.polyline(
+                [[-6.1751, 106.8272], [-1.2558, 116.8253]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var poly_line_6c2cd8b3d4fe56de4213f019a9fa6307 = L.polyline(
+                [[-6.1751, 106.8272], [-1.2558, 116.8253]],
+                {"bubblingMouseEvents": true, "color": "transparent", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "transparent", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 15}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            poly_line_6c2cd8b3d4fe56de4213f019a9fa6307.bindTooltip(
+                `<div>
+                     Jakarta-Balikpapan: 1236 KM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8b8467dbe85f13254b92b8462f6d55ec = L.polyline(
+                [[-7.2575, 112.7521], [-1.2558, 116.8253]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            var poly_line_6e7ee30b311fb3f6825d816340c01b6b = L.polyline(
+                [[-7.2575, 112.7521], [-1.2558, 116.8253]],
+                {"bubblingMouseEvents": true, "color": "transparent", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "transparent", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 15}
+            ).addTo(map_a29a32488d9367ab369be8f99614769b);
+        
+    
+            poly_line_6e7ee30b311fb3f6825d816340c01b6b.bindTooltip(
+                `<div>
+                     Surabaya-Balikpapan: 803 KM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+</script>
+</html>
