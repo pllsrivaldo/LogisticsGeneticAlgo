@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>AI Command Center</title>
+    <title> AGA LOGISTIC</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@
 <nav class="navbar mb-4 px-4">
     <div class="d-flex align-items-center">
         <i class="fas fa-microchip fa-2x text-info me-3"></i>
-        <div><div class="brand-font fs-4">STOWAGE.AI</div><small class="text-muted" style="letter-spacing: 3px;">COMMAND CENTER SYSTEM</small></div>
+        <div><div class="brand-font fs-4">AGA LOGISTIC</div><small style="letter-spacing: 3px; color: var(--neon-blue); text-shadow: 0 0 5px rgba(14, 165, 233, 0.5);">ALDO GIO ANTON</small></div>
     </div>
     <a href="/" class="btn btn-sm btn-outline-secondary rounded-0 px-4">DISCONNECT</a>
 </nav>
@@ -118,21 +118,42 @@
                 <div class="card-header-cyber d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-list me-2"></i> GLOBAL MANIFEST</span>
                     <form action="/admin/reset" method="post">
-                        <button class="btn btn-outline-danger btn-sm" style="font-size: 0.7rem;">RESET DATA</button>
+                        <button class="btn btn-outline-danger btn-sm" style="font-size: 0.7rem;">RESET ALL</button>
                     </form>
                 </div>
                 <div class="card-body p-0">
                     <div style="max-height: 200px; overflow-y: auto;">
-                        <table class="table table-cyber table-sm m-0">
-                            <thead><tr><th>ID</th><th>WEIGHT</th><th>DESTINATION</th><th>SOURCE</th></tr></thead>
+                        <table class="table table-cyber table-sm m-0 align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>WGT</th>
+                                    <th>DEST</th>
+                                    <th>SRC</th>
+                                    <th class="text-end">ACT</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 <tr th:each="c : ${manifest}">
                                     <td class="text-white" th:text="${c.id}"></td>
                                     <td th:text="${c.weightTon}"></td>
                                     <td th:text="${c.destName}"></td>
-                                    <td class="text-info" th:text="${c.addedBy}"></td>
+                                    <td>
+                                        <i th:if="${c.addedBy == 'Customer'}" class="fas fa-user text-success" title="Customer"></i>
+                                        <i th:unless="${c.addedBy == 'Customer'}" class="fas fa-robot text-warning" title="Admin"></i>
+                                    </td>
+                                    <td class="text-end">
+                                        <form action="/admin/delete" method="post" style="display:inline;">
+                                            <input type="hidden" name="id" th:value="${c.id}">
+                                            <button type="submit" class="btn btn-sm text-danger p-0 border-0 bg-transparent" title="Remove Item">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
-                                <tr th:if="${#lists.isEmpty(manifest)}"><td colspan="4" class="text-center py-3 text-muted">NO DATA UPLOADED</td></tr>
+                                <tr th:if="${#lists.isEmpty(manifest)}">
+                                    <td colspan="5" class="text-center py-3 text-muted">NO DATA UPLOADED</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

@@ -77,6 +77,18 @@ public class GeneticAlgorithmService {
     static final int TOP_SWAP_ATTEMPTS = 120;
     static final boolean IGNORE_SPECIAL_IN_BLOCKING = true;
 
+    // --- FITUR BARU: HAPUS PER ITEM ---
+    public void removeContainerById(int id) {
+        // 1. Hapus container dengan ID tersebut
+        globalManifest.removeIf(c -> c.id == id);
+        
+        // 2. RE-INDEXING (PENTING!)
+        // ID harus urut kembali (0, 1, 2...) agar logika GA tidak error
+        for (int i = 0; i < globalManifest.size(); i++) {
+            globalManifest.get(i).id = i;
+        }
+    }
+
     // --- DATA CLASSES ---
     public static class SimulationResult {
         public String consoleOutput;
@@ -125,10 +137,27 @@ public class GeneticAlgorithmService {
     }
 
     public static class GAParams {
-        int populationSize = 150; int maxGenerations = 300; double crossoverRate = 0.85; double mutationRate = 0.03; int tournamentSize = 3; Random rnd = new Random();
-        double tariffPerTon = 120.0; double costPerKg = 0.06; double distanceCostPerTonPerKm = 0.015; double specialExtraCostPerTon = 80.0;
-        double penaltyOverloadPerTon = 15000.0; double penaltyPerBlockingMove = 800.0; double penaltyUnplacedContainer = 25000.0;
-        double[][] perTonCost = null; double penaltySpecialStacking = 12000.0; double penaltySpecialExceed = 20000.0;
+        int populationSize = 150; 
+        int maxGenerations = 300; 
+        double crossoverRate = 0.85; 
+        double mutationRate = 0.03; 
+        int tournamentSize = 3; 
+        Random rnd = new Random();
+
+        // --- HARGA DINAIKKAN (Supaya Profit Hijau) ---
+        double tariffPerTon = 1000.0;        // $1000 per ton (Mahal, biar untung)
+        double costPerKg = 0.06; 
+        double distanceCostPerTonPerKm = 0.015; 
+        double specialExtraCostPerTon = 150.0; // Tambahan biaya handling barang khusus
+
+        // --- DENDA DIATUR ULANG ---
+        double penaltyOverloadPerTon = 15000.0; // Denda Overload fisik (Sangat Berat)
+        double penaltyPerBlockingMove = 800.0; 
+        double penaltyUnplacedContainer = 500.0; // Denda Reject DITURUNKAN (Biar AI berani reject tanpa takut rugi)
+        
+        double[][] perTonCost = null; 
+        double penaltySpecialStacking = 12000.0; 
+        double penaltySpecialExceed = 20000.0;
     }
 
     public static class EvalResult {
@@ -137,7 +166,6 @@ public class GeneticAlgorithmService {
         double[] stackWeights; int[] specialsPerStack; List<List<Integer>> stacksList;
     }
 
-    // --- CORE GA LOGIC ---
     public static class Evaluator {
         List<Container> containers; Ship ship; List<String> route; double[][] distances; GAParams p;
         public Evaluator(List<Container> containers, Ship ship, List<String> route, double[][] distances, GAParams p) {
@@ -152,20 +180,44 @@ public class GeneticAlgorithmService {
                 int best = -1; double bestDist = Double.MAX_VALUE;
                 for (int j = 0; j < n; j++) { if (visited[j]) continue; double d = (current < distances.length && j < distances[current].length) ? distances[current][j] : Double.MAX_VALUE; if (d < bestDist) { bestDist = d; best = j; } }
                 if (best == -1) break; visited[best] = true; order[best] = rank++; current = best;
-            }
-            return order;
+            } return order;
         }
         private double perTonCostAlongRoute(int destIndex) {
             if (destIndex <= 0) return 0.0; double sum = 0.0;
-            for (int i = 0; i < destIndex; i++) { int a = i, b = i + 1; if (distances != null && a < distances.length && b < distances[a].length) sum += p.distanceCostPerTonPerKm * distances[a][b]; }
-            return sum;
+            for (int i = 0; i < destIndex; i++) { int a = i, b = i + 1; if (distances != null && a < distances.length && b < distances[a].length) sum += p.distanceCostPerTonPerKm * distances[a][b]; } return sum;
         }
         public double evaluate(Individual ind) { EvalResult r = evaluateDetailed(ind); ind.fitness = r.fitness; ind.evaluated = true; return r.fitness; }
+
+        // --- METHOD INI YANG PENTING ---
         public EvalResult evaluateDetailed(Individual ind) {
-            EvalResult res = new EvalResult(); int S = ship.stacks; int slots = ship.totalSlots(); int containerCount = containers.size();
-            List<List<Integer>> stacksList = new ArrayList<>(); for (int s = 0; s < S; s++) stacksList.add(new ArrayList<>());
-            int placed = Math.min(containerCount, slots);
-            for (int genePos = 0; genePos < placed; genePos++) { int contIndex = ind.genes[genePos]; int stackIdx = genePos % S; stacksList.get(stackIdx).add(contIndex); }
+            EvalResult res = new EvalResult();
+            int S = ship.stacks;
+            int containerCount = containers.size();
+
+            // 1. Inisialisasi
+            List<List<Integer>> stacksList = new ArrayList<>();
+            double[] currentStackWeights = new double[S]; 
+            for (int s = 0; s < S; s++) { stacksList.add(new ArrayList<>()); currentStackWeights[s] = 0.0; }
+            List<Integer> loadedIndices = new ArrayList<>();
+            List<Integer> rejectedIndices = new ArrayList<>(); 
+
+            // 2. Logic Loading (Reject jika Overload)
+            for (int genePos = 0; genePos < containerCount; genePos++) {
+                int contIndex = ind.genes[genePos];
+                Container c = containers.get(contIndex);
+                int stackIdx = genePos % S;
+                boolean slotAvailable = stacksList.get(stackIdx).size() < ship.stackHeight;
+                boolean weightSafe = (currentStackWeights[stackIdx] + c.weightTon) <= ship.stackMaxTonnage[stackIdx];
+                if (slotAvailable && weightSafe) {
+                    stacksList.get(stackIdx).add(contIndex);
+                    currentStackWeights[stackIdx] += c.weightTon;
+                    loadedIndices.add(contIndex);
+                } else {
+                    rejectedIndices.add(contIndex);
+                }
+            }
+
+            // 3. Sorting & Check
             int[] visitOrder = computeVisitOrder();
             for (int s = 0; s < S; s++) {
                 List<Integer> st = stacksList.get(s);
@@ -173,26 +225,53 @@ public class GeneticAlgorithmService {
                     int va = (containers.get(a).destinationIndex >= 0 && containers.get(a).destinationIndex < visitOrder.length) ? visitOrder[containers.get(a).destinationIndex] : Integer.MAX_VALUE;
                     int vb = (containers.get(b).destinationIndex >= 0 && containers.get(b).destinationIndex < visitOrder.length) ? visitOrder[containers.get(b).destinationIndex] : Integer.MAX_VALUE;
                     if (va == Integer.MAX_VALUE && vb == Integer.MAX_VALUE) return 0; if (va == Integer.MAX_VALUE) return 1; if (vb == Integer.MAX_VALUE) return -1;
-                    return Integer.compare(vb, va);
+                    return Integer.compare(vb, va); 
                 });
             }
-            placeSpecialsOnTopPerStack(ind, containers, ship);
+
+            // 4. Hitung Keuangan
             double revenue = 0.0, cost = 0.0, penalty = 0.0;
-            for (Container c : containers) { revenue += p.tariffPerTon * c.weightTon; cost += p.costPerKg * (c.weightTon * 1000.0); if (c.isSpecial) cost += p.specialExtraCostPerTon * c.weightTon; cost += perTonCostAlongRoute(c.destinationIndex) * c.weightTon; }
-            res.revenue = revenue; res.cost = cost;
+            for (int idx : loadedIndices) {
+                Container c = containers.get(idx);
+                revenue += p.tariffPerTon * c.weightTon;
+                cost += p.costPerKg * (c.weightTon * 1000.0);
+                if (c.isSpecial) cost += p.specialExtraCostPerTon * c.weightTon;
+                cost += perTonCostAlongRoute(c.destinationIndex) * c.weightTon;
+            }
+            res.unplacedCount = rejectedIndices.size();
+            for(int idx : rejectedIndices) {
+                Container c = containers.get(idx);
+                penalty += c.weightTon * p.penaltyUnplacedContainer; // Pake param denda baru
+            }
+            res.unplacedPenalty = penalty;
+
+            // 5. Setup Report & Penalties Lain
             double[] stackWeights = new double[S]; int[] specialsPerStack = new int[S];
             for (int s = 0; s < S; s++) { double w = 0.0; int spec = 0; for (int idx : stacksList.get(s)) { Container c = containers.get(idx); w += c.weightTon; if (c.isSpecial) spec++; } stackWeights[s] = w; specialsPerStack[s] = spec; }
             res.stackWeights = stackWeights; res.specialsPerStack = specialsPerStack; res.stacksList = stacksList;
-            double overloadSum = 0.0; for (int s = 0; s < S; s++) { double over = stackWeights[s] - ship.stackMaxTonnage[s]; if (over > 0.0) overloadSum += over; }
+
+            double overloadSum = 0.0;
+            for (int s = 0; s < S; s++) { double over = stackWeights[s] - ship.stackMaxTonnage[s]; if (over > 0.001) overloadSum += over; }
             if (overloadSum > 0.0) { res.overloadTon = overloadSum; res.overloadPenalty = overloadSum * p.penaltyOverloadPerTon; penalty += res.overloadPenalty; }
-            if (containerCount > slots) { int unplaced = containerCount - slots; res.unplacedCount = unplaced; res.unplacedPenalty = unplaced * p.penaltyUnplacedContainer; penalty += res.unplacedPenalty; }
-            int specialNotSecure = 0; for (int s = 0; s < S; s++) { boolean stackIsSecure = ship.secureStacks.contains(s); for (int idx : stacksList.get(s)) { if (containers.get(idx).isSpecial && !stackIsSecure) specialNotSecure++; } }
+
+            int specialNotSecure = 0;
+            for (int s = 0; s < S; s++) { boolean stackIsSecure = ship.secureStacks.contains(s); for (int idx : stacksList.get(s)) { if (containers.get(idx).isSpecial && !stackIsSecure) specialNotSecure++; } }
             res.specialNotSecureCount = specialNotSecure; res.specialNotSecurePenalty = specialNotSecure * 5000.0; penalty += res.specialNotSecurePenalty;
-            int totalPlacedSpecials = 0; for (int s = 0; s < S; s++) { totalPlacedSpecials += specialsPerStack[s]; if (specialsPerStack[s] > 1) penalty += (specialsPerStack[s] - 1) * p.penaltySpecialStacking; }
+
+            int totalPlacedSpecials = 0;
+            for (int s = 0; s < S; s++) { totalPlacedSpecials += specialsPerStack[s]; if (specialsPerStack[s] > 1) penalty += (specialsPerStack[s] - 1) * p.penaltySpecialStacking; }
             if (totalPlacedSpecials > ship.maxSpecialCount()) { penalty += (totalPlacedSpecials - ship.maxSpecialCount()) * p.penaltySpecialExceed; }
+
             int blockingCount = 0;
             for (int s = 0; s < S; s++) { List<Integer> stack = stacksList.get(s); for (int lower = 0; lower < stack.size(); lower++) { Container lowerC = containers.get(stack.get(lower)); int lowerDest = lowerC.destinationIndex; for (int above = lower + 1; above < stack.size(); above++) { Container aboveC = containers.get(stack.get(above)); int aboveDest = aboveC.destinationIndex; if (IGNORE_SPECIAL_IN_BLOCKING && (lowerC.isSpecial || aboveC.isSpecial)) continue; int lowerOrder = (lowerDest >= 0 && lowerDest < visitOrder.length) ? visitOrder[lowerDest] : Integer.MAX_VALUE; int aboveOrder = (aboveDest >= 0 && aboveDest < visitOrder.length) ? visitOrder[aboveDest] : Integer.MAX_VALUE; if (aboveOrder > lowerOrder) blockingCount++; } } }
-            res.blockingCount = blockingCount; res.blockingPenalty = blockingCount * p.penaltyPerBlockingMove; penalty += res.blockingPenalty; res.penalty = penalty; res.fitness = revenue - cost - penalty; return res;
+            res.blockingCount = blockingCount; res.blockingPenalty = blockingCount * p.penaltyPerBlockingMove; penalty += res.blockingPenalty;
+
+            // --- FIX REVENUE MUNCUL ---
+            res.revenue = revenue;
+            res.cost = cost;
+            res.penalty = penalty;
+            res.fitness = revenue - cost - penalty;
+            return res;
         }
     }
 
@@ -208,9 +287,13 @@ public class GeneticAlgorithmService {
     static Individual[] orderCrossover(Individual p1, Individual p2, Random rnd) { int n = p1.genes.length; int[] c1 = new int[n]; Arrays.fill(c1, -1); int[] c2 = new int[n]; Arrays.fill(c2, -1); int a = rnd.nextInt(n), b = rnd.nextInt(n); if(a > b) { int t=a; a=b; b=t; } for(int i=a; i<=b; i++) { c1[i]=p1.genes[i]; c2[i]=p2.genes[i]; } int idx= (b+1)%n, pIdx=(b+1)%n; while(idx!=a) { int val=p2.genes[pIdx]; boolean present=false; for(int k=a; k<=b; k++) if(c1[k]==val) { present=true; break; } if(!present) { c1[idx]=val; idx=(idx+1)%n; } pIdx=(pIdx+1)%n; } idx=(b+1)%n; pIdx=(b+1)%n; while(idx!=a) { int val=p1.genes[pIdx]; boolean present=false; for(int k=a; k<=b; k++) if(c2[k]==val) { present=true; break; } if(!present) { c2[idx]=val; idx=(idx+1)%n; } pIdx=(pIdx+1)%n; } return new Individual[]{new Individual(c1), new Individual(c2)}; }
     static void mutateSwap(Individual ind, Random rnd) { int n = ind.genes.length; int i=rnd.nextInt(n), j=rnd.nextInt(n); int tmp=ind.genes[i]; ind.genes[i]=ind.genes[j]; ind.genes[j]=tmp; ind.evaluated=false; }
 
-    // --- MAIN RUN OPTIMIZATION ---
+    // --- GANTI METHOD runOptimization DENGAN INI ---
     public SimulationResult runOptimization() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(); PrintStream ps = new PrintStream(baos); PrintStream oldOut = System.out; System.setOut(ps);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+        PrintStream ps = new PrintStream(baos); 
+        PrintStream oldOut = System.out; 
+        System.setOut(ps);
+        
         List<String> route = new ArrayList<>(Arrays.asList("Jakarta", "Surabaya", "Batam", "Semarang", "Belawan", "Makassar", "Balikpapan"));
         
         List<String> orderedRoute = new ArrayList<>();
@@ -229,9 +312,6 @@ public class GeneticAlgorithmService {
         double[][] distances = new double[7][7];
         for(int i=0; i<7; i++) {
             for(int j=0; j<7; j++) {
-                int oldI = (i==0) ? currentOriginIdx : (i<=currentOriginIdx ? i-1 : i); // Simplified mapping fix
-                int oldJ = (j==0) ? currentOriginIdx : (j<=currentOriginIdx ? j-1 : j); 
-                // Actually, just mapping based on orderedRoute content is safest
                 int idxI = route.indexOf(orderedRoute.get(i));
                 int idxJ = route.indexOf(orderedRoute.get(j));
                 distances[i][j] = originalDist[idxI][idxJ]; 
@@ -251,31 +331,49 @@ public class GeneticAlgorithmService {
         Ship ship = this.currentShip;
         GAParams params = new GAParams();
         Individual best = null;
+        
+        // --- PROSES GENETIC ALGORITHM ---
         if(!containers.isEmpty()) {
             List<Individual> pop = new ArrayList<>();
             for(int i=0; i<params.populationSize; i++) {
                 Individual ind = new Individual(randomPermutation(containers.size(), params.rnd));
-                repairSpecialPlacement(ind, containers, ship); balanceOverloadedStacks(ind, containers, ship); enforceVisitOrder(ind, containers, ship, orderedRoute, distances);
-                new Evaluator(containers, ship, orderedRoute, distances, params).evaluate(ind); pop.add(ind);
+                repairSpecialPlacement(ind, containers, ship); 
+                // balanceOverloadedStacks mungkin kurang efektif dengan logic reject baru, tapi tidak bikin crash
+                // balanceOverloadedStacks(ind, containers, ship); 
+                enforceVisitOrder(ind, containers, ship, orderedRoute, distances);
+                new Evaluator(containers, ship, orderedRoute, distances, params).evaluate(ind); 
+                pop.add(ind);
             }
-            pop.sort((a,b)->Double.compare(b.fitness, a.fitness)); best = new Individual(pop.get(0).genes, true); best.fitness = pop.get(0).fitness;
+            pop.sort((a,b)->Double.compare(b.fitness, a.fitness)); 
+            best = new Individual(pop.get(0).genes, true); 
+            best.fitness = pop.get(0).fitness;
+            
             for(int gen=1; gen<=params.maxGenerations; gen++) {
                 List<Individual> offspring = new ArrayList<>();
                 while(offspring.size() < params.populationSize) {
-                    Individual p1 = pop.get(params.rnd.nextInt(pop.size())); Individual p2 = pop.get(params.rnd.nextInt(pop.size()));
+                    Individual p1 = pop.get(params.rnd.nextInt(pop.size())); 
+                    Individual p2 = pop.get(params.rnd.nextInt(pop.size()));
                     if(params.rnd.nextDouble() < params.crossoverRate) {
                         Individual[] kids = orderCrossover(p1, p2, params.rnd);
                         if(params.rnd.nextDouble() < params.mutationRate) mutateSwap(kids[0], params.rnd);
                         if(params.rnd.nextDouble() < params.mutationRate) mutateSwap(kids[1], params.rnd);
-                        repairSpecialPlacement(kids[0], containers, ship); repairSpecialPlacement(kids[1], containers, ship);
-                        balanceOverloadedStacks(kids[0], containers, ship); balanceOverloadedStacks(kids[1], containers, ship);
-                        enforceVisitOrder(kids[0], containers, ship, orderedRoute, distances); enforceVisitOrder(kids[1], containers, ship, orderedRoute, distances);
-                        new Evaluator(containers, ship, orderedRoute, distances, params).evaluate(kids[0]); new Evaluator(containers, ship, orderedRoute, distances, params).evaluate(kids[1]);
-                        offspring.add(kids[0]); if(offspring.size()<params.populationSize) offspring.add(kids[1]);
+                        repairSpecialPlacement(kids[0], containers, ship); 
+                        repairSpecialPlacement(kids[1], containers, ship);
+                        enforceVisitOrder(kids[0], containers, ship, orderedRoute, distances); 
+                        enforceVisitOrder(kids[1], containers, ship, orderedRoute, distances);
+                        new Evaluator(containers, ship, orderedRoute, distances, params).evaluate(kids[0]); 
+                        new Evaluator(containers, ship, orderedRoute, distances, params).evaluate(kids[1]);
+                        offspring.add(kids[0]); 
+                        if(offspring.size()<params.populationSize) offspring.add(kids[1]);
                     }
                 }
-                pop.addAll(offspring); pop.sort((a,b)->Double.compare(b.fitness, a.fitness)); pop = pop.subList(0, params.populationSize);
-                if(pop.get(0).fitness > best.fitness) { best = new Individual(pop.get(0).genes, true); best.fitness = pop.get(0).fitness; }
+                pop.addAll(offspring); 
+                pop.sort((a,b)->Double.compare(b.fitness, a.fitness)); 
+                pop = pop.subList(0, params.populationSize);
+                if(pop.get(0).fitness > best.fitness) { 
+                    best = new Individual(pop.get(0).genes, true); 
+                    best.fitness = pop.get(0).fitness; 
+                }
             }
         } else {
             best = new Individual(new int[0]); best.fitness = 0;
@@ -284,22 +382,52 @@ public class GeneticAlgorithmService {
         Evaluator ev = new Evaluator(containers, ship, orderedRoute, distances, params);
         EvalResult res = (!containers.isEmpty()) ? ev.evaluateDetailed(best) : new EvalResult();
         
-        System.out.flush(); System.setOut(oldOut);
+        System.out.flush(); 
+        System.setOut(oldOut);
 
         SimulationResult simRes = new SimulationResult();
-        simRes.consoleOutput = baos.toString(); simRes.fitness = res.fitness; simRes.revenue = res.revenue; simRes.cost = res.cost; simRes.penalty = res.penalty;
-        simRes.unplacedContainers = res.unplacedCount; simRes.loadedContainers = Math.min(containers.size(), ship.totalSlots()); simRes.shipData = ship;
+        simRes.consoleOutput = baos.toString(); 
+        simRes.fitness = res.fitness; 
+        simRes.revenue = res.revenue; 
+        simRes.cost = res.cost; 
+        simRes.penalty = res.penalty;
+        simRes.unplacedContainers = res.unplacedCount; 
+        
+        // --- PERBAIKAN PELAPORAN DATA DI SINI ---
+        
+        // Hitung total container yang BENAR-BENAR masuk (bukan rejected)
+        int realLoadedCount = 0;
+        if (res.stacksList != null) {
+            for(List<Integer> s : res.stacksList) realLoadedCount += s.size();
+        }
+        simRes.loadedContainers = realLoadedCount;
+        simRes.shipData = ship;
 
         if(!containers.isEmpty()) {
+            Set<Integer> placedIndices = new HashSet<>(); // Gunakan index list container, bukan ID
+
+            // 1. Masukkan data ke Visualisasi Stack
             for(int s=0; s<ship.stacks; s++) {
                 List<Container> stackContainers = new ArrayList<>();
                 List<Integer> containerIndices = res.stacksList.get(s);
-                for(Integer idx : containerIndices) stackContainers.add(containers.get(idx));
+                for(Integer idx : containerIndices) {
+                    stackContainers.add(containers.get(idx));
+                    placedIndices.add(idx); // Tandai bahwa index ini sukses dimuat
+                }
                 while(stackContainers.size() < ship.stackHeight) stackContainers.add(null);
-                Collections.reverse(stackContainers); simRes.visualStacks.add(stackContainers);
+                Collections.reverse(stackContainers); 
+                simRes.visualStacks.add(stackContainers);
             }
-            Set<Integer> placedIds = new HashSet<>(); for(int i=0; i<simRes.loadedContainers; i++) placedIds.add(best.genes[i]);
-            for(Container c : containers) { if(!placedIds.contains(c.id)) simRes.overloadList.add("ID " + c.id + " (" + c.destName + ")"); }
+
+            // 2. Generate List Overload (Yang Ditolak/Rejected)
+            // Loop semua container asli, cek apakah index-nya ada di placedIndices
+            for(int i=0; i<containers.size(); i++) {
+                if(!placedIndices.contains(i)) {
+                    Container c = containers.get(i);
+                    // Tambahkan ke list overload/rejected untuk ditampilkan di UI
+                    simRes.overloadList.add("ID " + c.id + " (" + c.destName + ") - " + c.weightTon + " Tons [REJECTED]");
+                }
+            }
         }
         return simRes;
     }
