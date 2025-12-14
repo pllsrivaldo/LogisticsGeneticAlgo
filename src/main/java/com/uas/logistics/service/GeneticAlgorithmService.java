@@ -24,7 +24,7 @@ public class GeneticAlgorithmService {
         return available;
     }
 
-    // --- REVISI: VALIDASI INPUT AGAR TIDAK CRASH ---
+    // VALIDASI INPUT AGAR TIDAK CRASH 
     public void updateShipConfig(String id, String name, double maxTon, int stacks, int height, String secureStacksStr, String stackCapStr, int originIdx) {
         // 1. Validasi Secure Stacks
         Set<Integer> secureStacks = new HashSet<>();
@@ -70,26 +70,26 @@ public class GeneticAlgorithmService {
 
     public void clearManifest() { globalManifest.clear(); }
 
-    // --- CONFIG FLAGS ---
+    // CONFIG FLAGS 
     static final boolean FORCE_SPECIALS_TO_SECURE = true;
     static final boolean RESERVE_ONE_STACK_FOR_SPECIALS = false;
     static final boolean ENABLE_AGGRESSIVE_TOP_SWAPS = true;
     static final int TOP_SWAP_ATTEMPTS = 120;
     static final boolean IGNORE_SPECIAL_IN_BLOCKING = true;
 
-    // --- FITUR BARU: HAPUS PER ITEM ---
+    // HAPUS PER ITEM 
     public void removeContainerById(int id) {
         // 1. Hapus container dengan ID tersebut
         globalManifest.removeIf(c -> c.id == id);
         
-        // 2. RE-INDEXING (PENTING!)
+        // 2. RE-INDEXING (PENTING)
         // ID harus urut kembali (0, 1, 2...) agar logika GA tidak error
         for (int i = 0; i < globalManifest.size(); i++) {
             globalManifest.get(i).id = i;
         }
     }
 
-    // --- DATA CLASSES ---
+    // DATA CLASSES 
     public static class SimulationResult {
         public String consoleOutput;
         public double fitness, revenue, cost, penalty;
@@ -116,14 +116,13 @@ public class GeneticAlgorithmService {
             this.secureStacks = secureStacks == null ? new HashSet<>() : secureStacks; this.stackMaxTonnage = stackMaxTonnage;
         }
         
-        // --- FUNGSI PENTING AGAR HTML TIDAK ERROR ---
+        // FUNGSI PENTING AGAR HTML TIDAK ERROR
         public String getCapString() {
             if (stackMaxTonnage == null) return "";
             return Arrays.stream(stackMaxTonnage)
                          .mapToObj(String::valueOf)
                          .collect(Collectors.joining(";"));
         }
-        // --------------------------------------------
 
         public int totalSlots() { return stacks * stackHeight; }
         public double totalTonnage() { double s = 0.0; for (double v : stackMaxTonnage) s += v; return s; }
@@ -144,16 +143,16 @@ public class GeneticAlgorithmService {
         int tournamentSize = 3; 
         Random rnd = new Random();
 
-        // --- HARGA DINAIKKAN (Supaya Profit Hijau) ---
-        double tariffPerTon = 1000.0;        // $1000 per ton (Mahal, biar untung)
+        // DUMMY HARGA 
+        double tariffPerTon = 1000.0;        
         double costPerKg = 0.06; 
         double distanceCostPerTonPerKm = 0.015; 
-        double specialExtraCostPerTon = 150.0; // Tambahan biaya handling barang khusus
+        double specialExtraCostPerTon = 150.0; 
 
-        // --- DENDA DIATUR ULANG ---
-        double penaltyOverloadPerTon = 15000.0; // Denda Overload fisik (Sangat Berat)
+        // DENDA  
+        double penaltyOverloadPerTon = 15000.0; 
         double penaltyPerBlockingMove = 800.0; 
-        double penaltyUnplacedContainer = 500.0; // Denda Reject DITURUNKAN (Biar AI berani reject tanpa takut rugi)
+        double penaltyUnplacedContainer = 500.0; 
         
         double[][] perTonCost = null; 
         double penaltySpecialStacking = 12000.0; 
@@ -188,7 +187,6 @@ public class GeneticAlgorithmService {
         }
         public double evaluate(Individual ind) { EvalResult r = evaluateDetailed(ind); ind.fitness = r.fitness; ind.evaluated = true; return r.fitness; }
 
-        // --- METHOD INI YANG PENTING ---
         public EvalResult evaluateDetailed(Individual ind) {
             EvalResult res = new EvalResult();
             int S = ship.stacks;
@@ -241,7 +239,7 @@ public class GeneticAlgorithmService {
             res.unplacedCount = rejectedIndices.size();
             for(int idx : rejectedIndices) {
                 Container c = containers.get(idx);
-                penalty += c.weightTon * p.penaltyUnplacedContainer; // Pake param denda baru
+                penalty += c.weightTon * p.penaltyUnplacedContainer; 
             }
             res.unplacedPenalty = penalty;
 
@@ -266,7 +264,7 @@ public class GeneticAlgorithmService {
             for (int s = 0; s < S; s++) { List<Integer> stack = stacksList.get(s); for (int lower = 0; lower < stack.size(); lower++) { Container lowerC = containers.get(stack.get(lower)); int lowerDest = lowerC.destinationIndex; for (int above = lower + 1; above < stack.size(); above++) { Container aboveC = containers.get(stack.get(above)); int aboveDest = aboveC.destinationIndex; if (IGNORE_SPECIAL_IN_BLOCKING && (lowerC.isSpecial || aboveC.isSpecial)) continue; int lowerOrder = (lowerDest >= 0 && lowerDest < visitOrder.length) ? visitOrder[lowerDest] : Integer.MAX_VALUE; int aboveOrder = (aboveDest >= 0 && aboveDest < visitOrder.length) ? visitOrder[aboveDest] : Integer.MAX_VALUE; if (aboveOrder > lowerOrder) blockingCount++; } } }
             res.blockingCount = blockingCount; res.blockingPenalty = blockingCount * p.penaltyPerBlockingMove; penalty += res.blockingPenalty;
 
-            // --- FIX REVENUE MUNCUL ---
+            // REVENUE 
             res.revenue = revenue;
             res.cost = cost;
             res.penalty = penalty;
@@ -275,7 +273,7 @@ public class GeneticAlgorithmService {
         }
     }
 
-    // --- HELPER METHODS ---
+    // HELPER METHODS 
     static int[] randomPermutation(int n, Random rnd) { int[] a = new int[n]; for (int i = 0; i < n; i++) a[i] = i; for (int i = n - 1; i > 0; i--) { int j = rnd.nextInt(i + 1); int tmp = a[i]; a[i] = a[j]; a[j] = tmp; } return a; }
     static void placeSpecialsOnTopPerStack(Individual ind, List<Container> containers, Ship ship) { int S = ship.stacks; int slots = ship.totalSlots(); int placed = Math.min(containers.size(), slots); if (S <= 0 || placed <= 0) return; List<List<Integer>> posPerStack = new ArrayList<>(); for(int s=0; s<S; s++) posPerStack.add(new ArrayList<>()); for(int pos=0; pos<placed; pos++) posPerStack.get(pos % S).add(pos); for(int s=0; s<S; s++) { List<Integer> positions = posPerStack.get(s); if(positions.isEmpty()) continue; List<Integer> nonSpec = new ArrayList<>(); List<Integer> spec = new ArrayList<>(); for(int pos : positions) { int cidx = ind.genes[pos]; if(containers.get(cidx).isSpecial) spec.add(cidx); else nonSpec.add(cidx); } int writeIdx = 0; for(int x : nonSpec) { ind.genes[positions.get(writeIdx++)] = x; } for(int x : spec) { ind.genes[positions.get(writeIdx++)] = x; } } }
     static void repairSpecialPlacementDefault(Individual ind, List<Container> containers, Ship ship) { int S = ship.stacks; int placed = Math.min(containers.size(), ship.totalSlots()); List<List<Integer>> posPerStack = new ArrayList<>(); for(int s=0; s<S; s++) posPerStack.add(new ArrayList<>()); for(int pos=0; pos<placed; pos++) posPerStack.get(pos % S).add(pos); List<Integer> specialPositions = new ArrayList<>(); for(int pos=0; pos<placed; pos++) if(containers.get(ind.genes[pos]).isSpecial) specialPositions.add(pos); LinkedList<Integer> availableStacks = new LinkedList<>(); List<Integer> secureAvail = new ArrayList<>(); for(int s=0; s<S; s++) { boolean hasSpec = false; for(int pos : posPerStack.get(s)) if(containers.get(ind.genes[pos]).isSpecial) { hasSpec = true; break; } if(!hasSpec) { if(ship.secureStacks.contains(s)) secureAvail.add(s); else availableStacks.add(s); } } Collections.shuffle(secureAvail, new Random(ship.hashCode())); for(int s : secureAvail) availableStacks.addFirst(s); for(int pos : new ArrayList<>(specialPositions)) { if(availableStacks.isEmpty()) break; int targetStack = availableStacks.removeFirst(); List<Integer> tgtPosList = posPerStack.get(targetStack); if(tgtPosList.isEmpty()) continue; int tgtPos = tgtPosList.get(tgtPosList.size()-1); int tmp = ind.genes[pos]; ind.genes[pos] = ind.genes[tgtPos]; ind.genes[tgtPos] = tmp; specialPositions.remove((Integer)pos); } }
@@ -287,7 +285,7 @@ public class GeneticAlgorithmService {
     static Individual[] orderCrossover(Individual p1, Individual p2, Random rnd) { int n = p1.genes.length; int[] c1 = new int[n]; Arrays.fill(c1, -1); int[] c2 = new int[n]; Arrays.fill(c2, -1); int a = rnd.nextInt(n), b = rnd.nextInt(n); if(a > b) { int t=a; a=b; b=t; } for(int i=a; i<=b; i++) { c1[i]=p1.genes[i]; c2[i]=p2.genes[i]; } int idx= (b+1)%n, pIdx=(b+1)%n; while(idx!=a) { int val=p2.genes[pIdx]; boolean present=false; for(int k=a; k<=b; k++) if(c1[k]==val) { present=true; break; } if(!present) { c1[idx]=val; idx=(idx+1)%n; } pIdx=(pIdx+1)%n; } idx=(b+1)%n; pIdx=(b+1)%n; while(idx!=a) { int val=p1.genes[pIdx]; boolean present=false; for(int k=a; k<=b; k++) if(c2[k]==val) { present=true; break; } if(!present) { c2[idx]=val; idx=(idx+1)%n; } pIdx=(pIdx+1)%n; } return new Individual[]{new Individual(c1), new Individual(c2)}; }
     static void mutateSwap(Individual ind, Random rnd) { int n = ind.genes.length; int i=rnd.nextInt(n), j=rnd.nextInt(n); int tmp=ind.genes[i]; ind.genes[i]=ind.genes[j]; ind.genes[j]=tmp; ind.evaluated=false; }
 
-    // --- GANTI METHOD runOptimization DENGAN INI ---
+    // METHOD runOptimization 
     public SimulationResult runOptimization() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
         PrintStream ps = new PrintStream(baos); 
@@ -332,14 +330,12 @@ public class GeneticAlgorithmService {
         GAParams params = new GAParams();
         Individual best = null;
         
-        // --- PROSES GENETIC ALGORITHM ---
+        // PROSES GENETIC ALGORITHM 
         if(!containers.isEmpty()) {
             List<Individual> pop = new ArrayList<>();
             for(int i=0; i<params.populationSize; i++) {
                 Individual ind = new Individual(randomPermutation(containers.size(), params.rnd));
                 repairSpecialPlacement(ind, containers, ship); 
-                // balanceOverloadedStacks mungkin kurang efektif dengan logic reject baru, tapi tidak bikin crash
-                // balanceOverloadedStacks(ind, containers, ship); 
                 enforceVisitOrder(ind, containers, ship, orderedRoute, distances);
                 new Evaluator(containers, ship, orderedRoute, distances, params).evaluate(ind); 
                 pop.add(ind);
@@ -393,9 +389,7 @@ public class GeneticAlgorithmService {
         simRes.penalty = res.penalty;
         simRes.unplacedContainers = res.unplacedCount; 
         
-        // --- PERBAIKAN PELAPORAN DATA DI SINI ---
-        
-        // Hitung total container yang BENAR-BENAR masuk (bukan rejected)
+        // Hitung total container yang BENAR-BENAR masuk 
         int realLoadedCount = 0;
         if (res.stacksList != null) {
             for(List<Integer> s : res.stacksList) realLoadedCount += s.size();

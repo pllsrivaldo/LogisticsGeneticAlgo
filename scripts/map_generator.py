@@ -4,8 +4,6 @@ import os
 import sys
 
 def generate_map():
-    # --- LOGIKA PATH OTOMATIS (AGAR TIDAK ERROR NOT FOUND) ---
-    # Kita cari folder tempat project berjalan
     current_dir = os.getcwd()
     
     # Target 1: Folder Source Code (agar file tetap ada saat coding)
@@ -19,7 +17,7 @@ def generate_map():
 
     print(f"Generating map...")
     
-    # --- DATA & VISUALISASI ---
+    # DATA & VISUALISASI 
     cities = {
         'Jakarta': (-6.1751, 106.8272),
         'Surabaya': (-7.2575, 112.7521),
@@ -58,7 +56,7 @@ def generate_map():
                 tooltip=f"{start_city}-{end_city}: {dist:.0f} KM"
             ).add_to(m)
 
-    # --- SIMPAN KE DUA LOKASI ---
+    # SIMPAN KE DUA LOKASI 
     m.save(path_src)    # Simpan ke src
     m.save(path_target) # Simpan ke target (Live)
     
